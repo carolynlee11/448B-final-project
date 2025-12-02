@@ -1,0 +1,544 @@
+/* ---------- GLOBAL ---------- */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Unna:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
+
+
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+}
+
+/* ---------- WRAPPER ---------- */
+
+.book-root {
+  width: 100%;
+  background: #e5e7eb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* flipbook shell */
+.book-flipbook {
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.28),
+    0 0 0 1px rgba(148, 163, 184, 0.35);
+  border-radius: 1.2rem;
+}
+
+/* base react-pageflip page */
+.page {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.35);  /* soft gray */
+  border-radius: 1rem;                          /* matches your card corners */
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   COVER PAGE (Inter only + minimalist fashion magazine vibe)
+   ============================================================ */
+
+.cover-page {
+  height: 100%;
+  padding: 2.4rem 2.6rem;
+  background: #fdfcf8;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* top metadata row */
+.cover-top-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.cover-label,
+.cover-date {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: #9ca3af;
+}
+.cover-title {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-size: 3.3rem;        /* Instrument Serif looks best slightly larger */
+  line-height: 1.12;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.cover-word {
+  letter-spacing: 0.02em;
+}
+
+.cover-icon {
+  display: inline-block;
+  vertical-align: baseline;
+  object-fit: contain;
+  margin: 0 0.5rem;
+}
+
+/* tagline */
+.cover-tagline {
+  font-size: 1rem;
+  color: #4b5563;
+  max-width: 28rem;
+  margin: 2rem 0 2.8rem;
+  line-height: 1.55;
+}
+
+/* byline */
+.cover-byline {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #9ca3af;
+}
+
+/* ============================================================
+   INNER SPREAD BASE
+   ============================================================ */
+
+.spread {
+  position: relative;
+  height: 100%;
+  border-radius: 1rem;
+  background: #fdfcf8;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+}
+
+
+/* page side */
+.spread-page {
+  padding: 1.9rem 2.2rem;
+  position: relative;
+}
+
+/* ============================================================
+   LEFT PAGE CONTENT
+   ============================================================ */
+
+.page-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: #9ca3af;
+  margin-bottom: 1.1rem;
+}
+
+/* hero block */
+.model-hero {
+  position: relative;
+  height: 360px;
+  border-radius: 0.9rem;
+  overflow: hidden;
+  background: radial-gradient(circle at top, #fefefe 0, #f5f5f5 55%, #e5e7eb 100%);
+}
+
+.model-base {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  background:
+    linear-gradient(to top, rgba(15, 23, 42, 0.06), transparent),
+    white;
+}
+
+.model-base::before {
+  content: "";
+  width: 60%;
+  height: 90%;
+  border-radius: 999px 999px 25% 25%;
+  background: linear-gradient(to bottom, #fafafa 0, #f97316 38%, #9ca3af 40%);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+}
+
+.placeholder-text {
+  position: absolute;
+  bottom: 0.7rem;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(31, 41, 55, 0.55);
+}
+
+/* little cutout cards */
+.mini-look {
+  position: absolute;
+  width: 80px;
+  height: 150px;
+  border-radius: 0.7rem;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.15);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* positions */
+.mini-look-1 { left: 10%; bottom: 16%; transform: rotate(-4deg); }
+.mini-look-2 { left: 28%; bottom: 31%; transform: rotate(2deg); }
+.mini-look-3 { left: 46%; bottom: 18%; transform: rotate(-3deg); }
+.mini-look-4 { right: 16%; bottom: 33%; transform: rotate(4deg); }
+.mini-look-5 { right: 8%; bottom: 8%; transform: rotate(-2deg); }
+
+/* yellow callout card */
+.left-caption {
+  margin-top: 1.4rem;
+  padding: 0.9rem 1rem;
+  background: #fef9c3;
+  border-radius: 0.9rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+  max-width: 19rem;
+}
+
+.left-caption-tag {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #9ca3af;
+}
+
+.left-caption-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin: 0.25rem 0;
+}
+
+.left-caption-text {
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: #4b5563;
+}
+
+/* bottom labels */
+.page-meta {
+  margin-top: 1.1rem;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #9ca3af;
+}
+
+/* ============================================================
+   RIGHT PAGE CONTENT
+   ============================================================ */
+
+.right-page {
+  background: #fdfcf8;
+}
+
+/* small pill */
+.page-nav {
+  position: absolute;
+  top: 1.4rem;
+  right: 2.2rem;
+}
+
+.page-nav-pill {
+  padding: 0.25rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: white;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #6b7280;
+}
+
+/* headline */
+.headline-block {}
+
+.headline-kicker {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
+}
+
+.headline-main {
+  font-size: 2.3rem;
+  font-weight: 600;
+  line-height: 1.05;
+  margin: 0 0 1rem;
+}
+
+.underline {
+  text-decoration: underline wavy;
+  text-underline-offset: 0.12em;
+}
+
+/* paragraph */
+.headline-copy {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #4b5563;
+  margin-bottom: 2rem;
+}
+
+/* scene summary */
+.scene-description p {
+  margin: 0 0 0.4rem;
+}
+
+.scene-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #6b7280;
+}
+
+.scene-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.scene-text {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #4b5563;
+}
+
+/* stickers */
+.sticker {
+  position: absolute;
+  background: white;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.9rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  border: none;
+}
+
+.sticker-label {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  border: 1px solid #111;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.sticker p {
+  margin: 0.3rem 0 0;
+  font-size: 0.75rem;
+}
+
+.sticker-a { top: 8.4rem; right: 2.6rem; transform: rotate(-4deg); }
+.sticker-b { top: 15.2rem; right: 5.3rem; transform: rotate(3deg); }
+.sticker-c { top: 21.4rem; right: 2.2rem; transform: rotate(-2deg); }
+
+.sticker-active {
+  box-shadow:
+    0 0 0 2px #111,
+    0 10px 24px rgba(0, 0, 0, 0.18);
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* film strip placeholder */
+.film-strip {
+  position: absolute;
+  left: 2.2rem;
+  right: 2.2rem;
+  bottom: 1.8rem;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.35rem;
+}
+
+.film-frame {
+  aspect-ratio: 4 / 3;
+  border-radius: 0.4rem;
+  background: #111;
+  position: relative;
+}
+
+.film-frame span {
+  font-size: 0.7rem;
+  color: white;
+  position: absolute;
+  bottom: 0.4rem;
+  left: 0.4rem;
+}
+
+/* responsive */
+@media (max-width: 960px) {
+  .book-root {
+    align-items: flex-start;
+    padding-top: 1.5rem;
+  }
+}
+
+.intro-page {
+  padding: 3rem 2.2rem;
+  background: #fdfcf8;
+  font-family: Inter, sans-serif;
+}
+
+.intro-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+}
+
+.intro-body {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #4b5563;
+  margin-bottom: 1.2rem;
+}
+
+.blank-page {
+  background: #fdfcf8;
+}
+
+/* ============================================================
+   BLANK PAGES (filler content so you can see the layout)
+   ============================================================ */
+
+.blank-page {
+  background: #fdfcf8;
+  padding: 2.4rem 2.2rem;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* shared title */
+.blank-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.6rem;
+  color: #374151;
+}
+
+/* ---------- Blank A: Notes layout ---------- */
+.blank-a {
+  position: relative;
+}
+
+.blank-dots {
+  height: calc(100% - 3rem);
+  width: 100%;
+  background-image: radial-gradient(#d1d5db 0.6px, transparent 0.6px);
+  background-size: 14px 14px;
+  border-radius: 0.6rem;
+  opacity: 0.45;
+}
+
+/* ---------- Blank B: Fake chart layout ---------- */
+.blank-b .fake-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.8rem;
+  margin-bottom: 1.4rem;
+  height: 140px;
+}
+
+.fake-bar {
+  flex: 1;
+  border-radius: 0.3rem;
+  background: linear-gradient(to top, #9ca3af, #d1d5db);
+  opacity: 0.6;
+}
+
+.bar-1 { height: 60%; }
+.bar-2 { height: 85%; }
+.bar-3 { height: 45%; }
+.bar-4 { height: 70%; }
+
+.blank-body {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #4b5563;
+  max-width: 28rem;
+}
+
+.text-page {
+  background: #fdfcf8;      /* soft off-white */
+  padding: 2.6rem 2.8rem;
+  box-sizing: border-box;
+  border-radius: 1rem;
+  font-family: Inter, sans-serif;
+  height: 100%;
+}
+
+/* Title */
+.text-page-title {
+  font-size: 1.9rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  color: #111827;
+  font-family: "Instrument Serif", serif;
+
+}
+
+/* Body text */
+.text-page-body {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #374151;
+  max-width: 42rem;
+}
+
+/* full-width single page for Scene 02 */
+.single-page {
+  height: 100%;
+  border-radius: 1rem;
+  background: #fdfcf8;
+  padding: 2rem 2.4rem 2.2rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.single-page-header {
+  max-width: 32rem;
+  margin-bottom: 1.8rem;
+}
+
+/* reuse existing typography */
+.single-page .scene-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #6b7280;
+  margin: 0 0 0.35rem;
+}
+
+/* make the interactive card strip wider */
+.recession-uniform-root {
+  width: 100%;
+  max-width: 600px; /* bump this up if you want even wider */
+  align-self: flex-start;
+}
+
+/* Make sure these can host absolutely positioned children */
+.page--cover,
+.page--intro {
+  position: relative;
+}
