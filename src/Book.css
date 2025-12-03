@@ -542,3 +542,70 @@ body {
 .page--intro {
   position: relative;
 }
+
+.macro-root {
+  margin-top: 1.4rem;
+}
+
+.macro-header {
+  max-width: 30rem;
+  margin-bottom: 1rem;
+}
+
+.macro-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #6b7280;
+  margin: 0 0 0.3rem;
+}
+
+.macro-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.macro-copy {
+  margin: 0 0 0.8rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: #4b5563;
+}
+
+.macro-toggle {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+
+.macro-toggle-btn {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 0.25rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  cursor: pointer;
+}
+
+.macro-toggle-btn--active {
+  background: #111827;
+  color: #f9fafb;
+  border-color: #111827;
+}
+
+.macro-chart-shell {
+  margin-top: 0.8rem;
+  padding: 0.8rem 0.6rem 0.2rem;
+  border-radius: 0.9rem;
+  background: #fdfcf8;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+.macro-footnote {
+  margin: 0.4rem 0 0;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}

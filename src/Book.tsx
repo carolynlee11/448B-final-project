@@ -2,7 +2,9 @@
 import React from "react";
 import HTMLFlipBookDefault from "react-pageflip";
 import "./Book.css";
+import { MacroTrends } from "./MacroTrends";
 import { RecessionUniform } from "./RecessionUniform";
+
 
 const HTMLFlipBook = HTMLFlipBookDefault as any;
 
@@ -116,45 +118,50 @@ function Book() {
         {/* SCENE SPREADS */}
         {/* ------------------------------------------------------ */}
         {SCENES.map((scene) => (
-          <div className="page" key={scene.id}>
-            {scene.id === "scene2" ? (
-              // --------- SINGLE FULL PAGE FOR SCENE 02 ----------
-              <div className="single-page">
-                <header className="single-page-header">
-                  <p className="scene-label">
-                    Scene {scene.number} · {scene.shortLabel}
-                  </p>
-                  <h1 className="scene-title">{scene.title}</h1>
-                  <p className="scene-text">{scene.description}</p>
-                </header>
+  <div className="page" key={scene.id}>
+    {scene.id === "scene2" ? (
+      // your full-page RecessionUniform stays as-is
+      <div className="single-page">
+        <header className="single-page-header">
+          <p className="scene-label">
+            Scene {scene.number} · {scene.shortLabel}
+          </p>
+          <h1 className="scene-title">{scene.title}</h1>
+          <p className="scene-text">{scene.description}</p>
+        </header>
+        <RecessionUniform />
+      </div>
+    ) : scene.id === "scene1" ? (
+      // Scene 01: single-page macro chart
+      <div className="single-page">
+        <header className="single-page-header">
+          <p className="scene-label">
+            Scene {scene.number} · {scene.shortLabel}
+          </p>
+          <h1 className="scene-title">{scene.title}</h1>
+          <p className="scene-text">{scene.description}</p>
+        </header>
+        <MacroTrends />
+      </div>
+    ) : (
+      // Scene 03 can still use your spread or another single-page block
+      <div className="single-page">
+        <header className="single-page-header">
+          <p className="scene-label">
+            Scene {scene.number} · {scene.shortLabel}
+          </p>
+          <h1 className="scene-title">{scene.title}</h1>
+          <p className="scene-text">{scene.description}</p>
+        </header>
+        {/* placeholder for price tiers chart */}
+        <div className="macro-chart-shell">
+          <p>Price tiers chart coming soon.</p>
+        </div>
+      </div>
+    )}
+  </div>
+))}
 
-                {/* wide interactive panel */}
-                <RecessionUniform />
-              </div>
-            ) : (
-              // --------- TWO-COLUMN SPREAD FOR OTHER SCENES ------
-              <div className="spread">
-                <div className="spread-spine" />
-
-                {/* LEFT PAGE */}
-                <section className="spread-page">
-                </section>
-
-                {/* RIGHT PAGE */}
-                <section className="spread-page right-page">
-                  {/* simple placeholder for now */}
-                  <div className="film-strip">
-                    {scene.filmFrames.map((label) => (
-                      <div key={label} className="film-frame">
-                        <span className="placeholder-text">{label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              </div>
-            )}
-          </div>
-        ))}
 
         <div className="page page--intro">
           <div className="text-page">

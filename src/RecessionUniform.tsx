@@ -3,40 +3,16 @@ import React, { useEffect, useMemo, useState } from "react";
 import Papa from "papaparse";
 import "./RecessionUniform.css";
 
-// ----------------------------
-// Types for CSV rows
-// ----------------------------
-
-type ProductRow = {
-  main_category?: string;
+type MetaRow = {
+  parent_asin?: string;
+  product_type?: string;       // <- from your cleaning
   title?: string;
+  price?: string | number;
   average_rating?: string | number;
   rating_number?: string | number;
-  features?: string;
-  price?: string | number;
-  videos?: string;
-  store?: string;
-  categories?: string; // often JSON-ish string; we'll treat it as plain text for matching
+  categories?: string;
   details?: string;
-  parent_asin?: string;
-  bought_together?: string;
 };
-
-type ReviewRow = {
-  rating?: string | number;
-  title?: string;
-  text?: string;
-  asin?: string;
-  parent_asin?: string;
-  user_id?: string;
-  timestamp?: string; // can parse to Date later
-  helpful_vote?: string | number;
-  verified_purchase?: string;
-};
-
-// ----------------------------
-// Derived structure for the UI
-// ----------------------------
 
 type UniformItem = {
   id: string;
@@ -46,7 +22,140 @@ type UniformItem = {
   avgRating: number | null;
 };
 
-// Simple helper to parse price strings like "$39.99", "39.99", "39"
+const CATEGORY_DEFS = [
+  {
+    id: "dress",
+    label: "Dress",
+    matches: (p: MetaRow) => {
+      const pt = p.product_type?.toLowerCase() ?? "";
+      const text =
+        (
+          (p.title ?? "") +
+          " " +
+          (p.categories ?? "") +
+          " " +
+          (p.details ?? "")
+        )
+          .toString()
+          .toLowerCase();
+      return (
+        pt === "dress" ||
+        text.includes("dress") ||
+        text.includes("maxi dress") ||
+        text.includes("midi dress")
+      );
+    },
+  },
+  {
+    id: "professional",
+    label: "Professional",
+    matches: (p: MetaRow) => {
+      const pt = p.product_type?.toLowerCase() ?? "";
+      const text =
+        (
+          (p.title ?? "") +
+          " " +
+          (p.categories ?? "") +
+          " " +
+          (p.details ?? "")
+        )
+          .toString()
+          .toLowerCase();
+      return (
+        pt === "professional" ||
+        text.includes("blazer") ||
+        text.includes("suit") ||
+        text.includes("work") ||
+        text.includes("office")
+      );
+    },
+  },
+  {
+    id: "denim",
+    label: "Denim",
+    matches: (p: MetaRow) => {
+      const text =
+        (
+          (p.title ?? "") +
+          " " +
+          (p.categories ?? "") +
+          " " +
+          (p.details ?? "")
+        )
+          .toString()
+          .toLowerCase();
+      return (
+        text.includes("denim") ||
+        text.includes("jean") ||
+        text.includes("jeans")
+      );
+    },
+  },
+  {
+    id: "coat",
+    label: "Coat",
+    matches: (p: MetaRow) => {
+      const text =
+        (
+          (p.title ?? "") +
+          " " +
+          (p.categories ?? "") +
+          " " +
+          (p.details ?? "")
+        )
+          .toString()
+          .toLowerCase();
+      return (
+        text.includes("coat") ||
+        text.includes("trench") ||
+        text.includes("overcoat")
+      );
+    },
+  },
+  {
+    id: "sneaker",
+    label: "Sneaker",
+    matches: (p: MetaRow) => {
+      const text =
+        (
+          (p.title ?? "") +
+          " " +
+          (p.categories ?? "") +
+          " " +
+          (p.details ?? "")
+        )
+          .toString()
+          .toLowerCase();
+      return (
+        text.includes("sneaker") ||
+        text.includes("trainer") ||
+        text.includes("running shoe")
+      );
+    },
+  },
+  {
+    id: "heels",
+    label: "Heels",
+    matches: (p: MetaRow) => {
+      const text =
+        (
+          (p.title ?? "") +
+          " " +
+          (p.categories ?? "") +
+          " " +
+          (p.details ?? "")
+        )
+          .toString()
+          .toLowerCase();
+      return (
+        text.includes("heel") ||
+        text.includes("pumps") ||
+        text.includes("stiletto")
+      );
+    },
+  },
+];
+
 function parsePrice(raw: string | number | undefined): number | null {
   if (raw == null) return null;
   const s = String(raw).replace(/[^0-9.]/g, "");
@@ -60,113 +169,34 @@ function parseNumber(raw: string | number | undefined): number | null {
   return Number.isFinite(v) ? v : null;
 }
 
-// ----------------------------
-// Category matching rules
-// ----------------------------
-
-const CATEGORY_DEFS = [
-  {
-    id: "denim",
-    label: "Denim",
-    keywords: ["denim", "jean", "jeans"],
-  },
-  {
-    id: "coat",
-    label: "Black coat",
-    keywords: ["coat", "trench", "overcoat"],
-  },
-  {
-    id: "tee",
-    label: "White tee",
-    keywords: ["t-shirt", "tee", "t shirt"],
-  },
-  {
-    id: "tote",
-    label: "Tote",
-    keywords: ["tote", "shopper bag"],
-  },
-  {
-    id: "sneaker",
-    label: "Sneaker",
-    keywords: ["sneaker", "trainer", "running shoe"],
-  },
-  {
-    id: "heels",
-    label: "Heels",
-    keywords: ["heel", "pumps", "stiletto"],
-  },
-];
-
-// Does this product roughly belong in a category based on its text fields?
-function productMatchesCategory(p: ProductRow, keywords: string[]): boolean {
-  const text =
-    (
-      (p.title ?? "") +
-      " " +
-      (p.categories ?? "") +
-      " " +
-      (p.features ?? "") +
-      " " +
-      (p.details ?? "")
-    )
-      .toString()
-      .toLowerCase();
-
-  return keywords.some((kw) => text.includes(kw));
-}
-
-// ----------------------------
-// Main component
-// ----------------------------
-
 export const RecessionUniform: React.FC = () => {
-  const [products, setProducts] = useState<ProductRow[] | null>(null);
-  const [reviews, setReviews] = useState<ReviewRow[] | null>(null);
+  const [meta, setMeta] = useState<MetaRow[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Load metadata + reviews once on mount
   useEffect(() => {
-    // 📁 Adjust paths if needed:
-    // Put your CSVs in public/data/ so Vite serves them at /data/...
-    const metaUrl = "/data/amazon_fashion_metadata.csv";
-    const reviewsUrl = "/data/amazon_reviews.csv";
+    // ⚠️ Place df_meta.csv in public/data/ so this URL works
+    const url = "/data/df_meta.csv";
 
-    Papa.parse<ProductRow>(metaUrl, {
+    Papa.parse<MetaRow>(url, {
       download: true,
       header: true,
       skipEmptyLines: true,
       complete: (result) => {
-        setProducts(result.data);
+        setMeta(result.data);
       },
       error: (err) => {
-        console.error("Error loading metadata CSV", err);
+        console.error("Error loading df_meta.csv", err);
         setError("Could not load fashion metadata.");
-      },
-    });
-
-    Papa.parse<ReviewRow>(reviewsUrl, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: (result) => {
-        setReviews(result.data);
-      },
-      error: (err) => {
-        console.error("Error loading reviews CSV", err);
-        // Not fatal for this scene, so don't overwrite error
       },
     });
   }, []);
 
-  // Derive uniform stats from the metadata
   const items: UniformItem[] = useMemo(() => {
-    if (!products) return [];
+    if (!meta) return [];
 
     return CATEGORY_DEFS.map((def) => {
-      const bucket: ProductRow[] = products.filter((p) =>
-        productMatchesCategory(p, def.keywords)
-      );
+      const bucket = meta.filter((row) => def.matches(row));
 
       if (bucket.length === 0) {
         return {
@@ -184,14 +214,14 @@ export const RecessionUniform: React.FC = () => {
       let ratingCount = 0;
 
       for (const p of bucket) {
-        const price = parsePrice(p.price);
-        if (price != null) {
-          priceSum += price;
+        const pr = parsePrice(p.price);
+        if (pr != null) {
+          priceSum += pr;
           priceCount += 1;
         }
-        const rating = parseNumber(p.average_rating);
-        if (rating != null) {
-          ratingSum += rating;
+        const r = parseNumber(p.average_rating);
+        if (r != null) {
+          ratingSum += r;
           ratingCount += 1;
         }
       }
@@ -207,11 +237,10 @@ export const RecessionUniform: React.FC = () => {
         avgRating,
       };
     });
-  }, [products]);
+  }, [meta]);
 
-  // Default to first category when data arrives
   useEffect(() => {
-    if (items.length > 0 && !activeId) {
+    if (!activeId && items.length > 0) {
       setActiveId(items[0].id);
     }
   }, [items, activeId]);
@@ -224,10 +253,10 @@ export const RecessionUniform: React.FC = () => {
     );
   }
 
-  if (!products || items.length === 0 || !activeId) {
+  if (!meta || items.length === 0 || !activeId) {
     return (
       <div className="recession-uniform-root">
-        <p className="uniform-loading">Loading wardrobe from CSV…</p>
+        <p className="uniform-loading">Loading wardrobe from df_meta…</p>
       </div>
     );
   }
@@ -236,7 +265,7 @@ export const RecessionUniform: React.FC = () => {
 
   const maxPrice = Math.max(
     ...items.map((d) => (d.avgPrice ?? 0)),
-    1 // avoid 0
+    1
   );
   const maxCount = Math.max(...items.map((d) => d.count), 1);
 
@@ -247,14 +276,12 @@ export const RecessionUniform: React.FC = () => {
 
   return (
     <div className="recession-uniform-root">
-      {/* Summary text driven by active category */}
       <div className="uniform-summary">
         <p className="uniform-summary-label">Scene 02 · Recession uniform</p>
         <p className="uniform-summary-main">
-          In our catalog, <span className="uniform-highlight">
-            {active.label}
-          </span>{" "}
-          typically sits around{" "}
+          In our catalog,{" "}
+          <span className="uniform-highlight">{active.label}</span> typically
+          sits around{" "}
           <span className="uniform-highlight">
             {formatPrice(active.avgPrice)}
           </span>{" "}
@@ -271,7 +298,6 @@ export const RecessionUniform: React.FC = () => {
         )}
       </div>
 
-      {/* Card strip */}
       <div className="uniform-strip">
         {items.map((item) => {
           const priceRatio =
@@ -313,7 +339,11 @@ export const RecessionUniform: React.FC = () => {
 
                 <div className="uniform-metrics">
                   <span>{formatPrice(item.avgPrice)}</span>
-                  <span>{item.avgRating != null ? `${item.avgRating.toFixed(1)}★` : "—"}</span>
+                  <span>
+                    {item.avgRating != null
+                      ? `${item.avgRating.toFixed(1)}★`
+                      : "—"}
+                  </span>
                 </div>
               </div>
             </button>
