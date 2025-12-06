@@ -97,7 +97,7 @@ export const InflationVsSentiment: React.FC = () => {
       <div className="infl-chart-stack">
         {/* Chart 1: 1-star review share */}
         <div className="infl-chart">
-          <h3 className="infl-chart-title">% of reviews that are 1-star</h3>
+          <h3 className="infl-chart-title">Percentage of reviews that are 1-star (2018-2022)</h3>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart
               data={oneStar}
@@ -110,24 +110,24 @@ export const InflationVsSentiment: React.FC = () => {
                 tick={{ fontSize: 10 }}
                 ticks={xTicks}
                 label={{
-                  value: "Month",
+                  value: "Month (2018-2022)",
                   position: "insideBottom",
                   dy: 18,
-                  style: { fontSize: 10 },
+                  style: { fontSize: 12 },
                 }}
               />
               <YAxis
                 tick={{ fontSize: 10 }}
-                domain={[0.10, 0.22]}                 // fixed, no weird 21.3 cap
-                ticks={[0.10, 0.14, 0.18, 0.22]}      // evenly spaced ticks
+                domain={[0.10, 0.22]}
+                ticks={[0.10, 0.14, 0.18, 0.22]}
                 tickFormatter={(v) => `${(v * 100).toFixed(1)}%`}
                 label={{
-                  value: "% of reviews that are 1-star",
+                  value: "% of reviews (1 star)",
                   angle: -90,
                   position: "insideLeft",
                   dx: 5,
                   dy: 60,
-                  style: { fontSize: 10 },
+                  style: { fontSize: 12 },
                 }}
               />
               <Tooltip
@@ -147,7 +147,7 @@ export const InflationVsSentiment: React.FC = () => {
 
         {/* Chart 2: YOY inflation */}
         <div className="infl-chart">
-          <h3 className="infl-chart-title">Year-over-year inflation</h3>
+          <h3 className="infl-chart-title">Year-over-year inflation (2018-2022)</h3>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart
               data={inflation}
@@ -159,10 +159,10 @@ export const InflationVsSentiment: React.FC = () => {
                 tick={{ fontSize: 10 }}
                 ticks={xTicks}
                 label={{
-                  value: "Month",
+                  value: "Month (2018-2022)",
                   position: "insideBottom",
                   dy: 18,
-                  style: { fontSize: 10 },
+                  style: { fontSize: 12 },
                 }}
               />
               <YAxis
@@ -173,8 +173,8 @@ export const InflationVsSentiment: React.FC = () => {
                   angle: -90,
                   position: "insideLeft",
                   dx: 5,
-                  dy: 50,
-                  style: { fontSize: 10 },
+                  dy: 70,
+                  style: { fontSize: 12 },
                 }}
               />
               <Tooltip

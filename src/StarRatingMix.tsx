@@ -142,6 +142,7 @@ export const StarRatingMix: React.FC<StarRatingMixProps> = ({
 
   return (
     <div className="macro-chart-shell">
+      
       {/* Toggle chips above the chart */}
       <div className="macro-toggle-row" style={{ marginBottom: "0.75rem" }}>
         <span className="macro-toggle-label">Highlight ratings:</span>
@@ -161,7 +162,12 @@ export const StarRatingMix: React.FC<StarRatingMixProps> = ({
             {RATING_LABEL[key]}
           </button>
         ))}
+
+        
       </div>
+      <h3 className="infl-chart-title">
+          Proportion of Reviews by Star Rating Over Time (2018–2022)
+        </h3>
 
       {active ? (
         <ResponsiveContainer width="100%" height={340}>
@@ -179,8 +185,8 @@ export const StarRatingMix: React.FC<StarRatingMixProps> = ({
               label={{
                 value: "Month",
                 position: "insideBottom",
-                dy: 18,
-                style: { fontSize: 10 },
+                dy: 12,
+                style: { fontSize: 12 },
               }}
             />
 
@@ -192,8 +198,9 @@ export const StarRatingMix: React.FC<StarRatingMixProps> = ({
                 value: "Proportion of reviews",
                 angle: -90,
                 position: "insideLeft",
-                dx: -6,
-                style: { fontSize: 10 },
+                dx: 5,
+                dy: 60,
+                style: { fontSize: 12 },
               }}
             />
 

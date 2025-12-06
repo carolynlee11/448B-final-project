@@ -621,6 +621,8 @@ body {
   font-weight: 600;
   margin: 0 0 0.25rem;
   color: #4b5563;
+  text-align: center;
+
 }
 
 .macro-toggle-row {

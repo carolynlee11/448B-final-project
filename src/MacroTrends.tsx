@@ -9,6 +9,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,          // <-- added
 } from "recharts";
 
 type Row = {
@@ -28,11 +29,11 @@ type CombinedPoint = {
 type CategoryKey = "dress" | "suit" | "jacket" | "shoes" | "sweater";
 
 const CATEGORY_META: Record<CategoryKey, { label: string; color: string }> = {
-  dress: { label: "Dress", color: "#111827" }, // near-black
-  suit: { label: "Suit", color: "#1d4ed8" }, // blue
-  jacket: { label: "Jacket", color: "#16a34a" }, // green
-  shoes: { label: "Shoes", color: "#b91c1c" }, // red
-  sweater: { label: "Sweater", color: "#7c3aed" }, // purple
+  dress: { label: "Dress", color: "#111827" }, 
+  suit: { label: "Suit", color: "#1d4ed8" },
+  jacket: { label: "Jacket", color: "#16a34a" }, 
+  shoes: { label: "Shoes", color: "#b91c1c" }, 
+  sweater: { label: "Sweater", color: "#7c3aed" }, 
 };
 
 export const MacroTrends: React.FC = () => {
@@ -40,7 +41,6 @@ export const MacroTrends: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // which lines are visible
   const [visible, setVisible] = useState<Record<CategoryKey, boolean>>({
     dress: true,
     suit: true,
@@ -214,6 +214,10 @@ export const MacroTrends: React.FC = () => {
       </div>
 
       <div className="macro-chart-shell">
+        <h3 className="infl-chart-title">
+          Review volume across fashion categories (2018–2022)
+        </h3>
+
         <ResponsiveContainer width="100%" height={300}>
           <LineChart
             data={data}
@@ -237,10 +241,11 @@ export const MacroTrends: React.FC = () => {
             <YAxis
               tick={{ fontSize: 10 }}
               label={{
-                value: "Number of Reviews",
+                value: "Number of reviews",
                 angle: -90,
                 position: "insideLeft",
-                dx: -35,
+                dx: 5,
+                dy: 60,
                 fontSize: 12,
               }}
             />
@@ -254,9 +259,19 @@ export const MacroTrends: React.FC = () => {
               labelFormatter={(m) => m}
             />
 
-            {(
-              Object.keys(CATEGORY_META) as CategoryKey[]
-            ).map((key) => {
+            {/* Legend, similar to star rating mix */}
+            <Legend
+              verticalAlign="top"
+              align="right"
+              wrapperStyle={{ fontSize: 10, paddingBottom: 4 }}
+              formatter={(value: string) => {
+                const meta =
+                  CATEGORY_META[value as CategoryKey] ?? { label: value };
+                return meta.label;
+              }}
+            />
+
+            {(Object.keys(CATEGORY_META) as CategoryKey[]).map((key) => {
               if (!visible[key]) return null;
               const meta = CATEGORY_META[key];
               return (
@@ -268,18 +283,12 @@ export const MacroTrends: React.FC = () => {
                   strokeWidth={2}
                   dot={false}
                   activeDot={{ r: 4 }}
-                  name={meta.label}
+                  name={key} // Legend uses this + formatter
                 />
               );
             })}
           </LineChart>
         </ResponsiveContainer>
-
-        <p className="macro-footnote">
-          Daily review counts were aggregated to months in the notebook. All
-          series share the same y-axis, so relative shapes and spikes are
-          directly comparable.
-        </p>
       </div>
     </div>
   );
