@@ -609,3 +609,34 @@ body {
   font-size: 0.75rem;
   color: #9ca3af;
 }
+
+.macro-view-tabs {
+  margin-top: 1rem;
+  display: inline-flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.macro-view-tab {
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  background: #f9fafb;
+  cursor: pointer;
+}
+
+.macro-view-tab--active {
+  background: #111827;
+  color: #f9fafb;
+  border-color: #111827;
+}
+
+.macro-view-description {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: #4b5563;
+  max-width: 32rem;
+}

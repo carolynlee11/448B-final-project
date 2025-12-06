@@ -1,5 +1,5 @@
 // src/MacroTrends.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Papa from "papaparse";
 import {
   LineChart,
@@ -11,89 +11,161 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-type ReviewRow = {
-  product_type?: string;
-  date_posted?: string;  // your cleaned column
-  reviewTime?: string;   // fallback if present
-  rating?: string | number;
+type Row = {
+  date_posted?: string;
+  review_count?: string | number;
 };
 
-type SeriesKey = "dress" | "professional";
-
-const SERIES_META: Record<SeriesKey, { label: string }> = {
-  dress: { label: "Dress" },
-  professional: { label: "Professional" },
-};
-
-type MonthlyPoint = {
-  month: string;           // "2018-01"
+type CombinedPoint = {
+  month: string; // "YYYY-MM"
   dress: number;
-  professional: number;
+  suit: number;
+  jacket: number;
+  shoes: number;
+  sweater: number;
+};
+
+type CategoryKey = "dress" | "suit" | "jacket" | "shoes" | "sweater";
+
+const CATEGORY_META: Record<CategoryKey, { label: string; color: string }> = {
+  dress: { label: "Dress", color: "#111827" }, // near-black
+  suit: { label: "Suit", color: "#1d4ed8" }, // blue
+  jacket: { label: "Jacket", color: "#16a34a" }, // green
+  shoes: { label: "Shoes", color: "#b91c1c" }, // red
+  sweater: { label: "Sweater", color: "#7c3aed" }, // purple
 };
 
 export const MacroTrends: React.FC = () => {
-  const [rows, setRows] = useState<ReviewRow[] | null>(null);
+  const [data, setData] = useState<CombinedPoint[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [series, setSeries] = useState<SeriesKey>("dress");
+
+  // which lines are visible
+  const [visible, setVisible] = useState<Record<CategoryKey, boolean>>({
+    dress: true,
+    suit: true,
+    jacket: true,
+    shoes: true,
+    sweater: true,
+  });
 
   useEffect(() => {
-    // ⚠️ Put df_reviews.csv in public/data/
-    const url = "/data/df_reviews.csv";
+    let cancelled = false;
 
-    Papa.parse<ReviewRow>(url, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: (result) => {
-        setRows(result.data);
-      },
-      error: (err) => {
-        console.error("Error loading df_reviews.csv", err);
-        setError("Could not load reviews data.");
-      },
-    });
+    const parseCategory = (file: string): Promise<Record<string, number>> => {
+      return new Promise((resolve, reject) => {
+        Papa.parse<Row>(file, {
+          download: true,
+          header: true,
+          skipEmptyLines: true,
+          complete: (result: any) => {
+            try {
+              const rows: Row[] = result.data ?? [];
+              const byMonth: Record<string, number> = {};
+
+              for (const r of rows) {
+                if (!r.date_posted) continue;
+
+                const d = new Date(r.date_posted);
+                if (Number.isNaN(d.getTime())) continue;
+
+                const year = d.getFullYear();
+                if (year < 2018 || year > 2022) continue;
+
+                const monthKey = `${year}-${String(
+                  d.getMonth() + 1
+                ).padStart(2, "0")}-01`;
+
+                let count: number;
+                if (typeof r.review_count === "string") {
+                  const parsed = parseInt(r.review_count, 10);
+                  count = Number.isNaN(parsed) ? 0 : parsed;
+                } else if (typeof r.review_count === "number") {
+                  count = r.review_count;
+                } else {
+                  count = 0;
+                }
+
+                byMonth[monthKey] = (byMonth[monthKey] || 0) + count;
+              }
+
+              resolve(byMonth);
+            } catch (e) {
+              reject(e);
+            }
+          },
+          error: (err) => {
+            reject(err);
+          },
+        });
+      });
+    };
+
+    const loadAll = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const [
+          dressByMonth,
+          suitByMonth,
+          jacketByMonth,
+          shoesByMonth,
+          sweaterByMonth,
+        ] = await Promise.all([
+          parseCategory("/data/dress_review_counts.csv"),
+          parseCategory("/data/suit_review_counts.csv"),
+          parseCategory("/data/jacket_review_counts.csv"),
+          parseCategory("/data/shoes_review_counts.csv"),
+          parseCategory("/data/sweater_review_counts.csv"),
+        ]);
+
+        if (cancelled) return;
+
+        const allMonths = new Set([
+          ...Object.keys(dressByMonth),
+          ...Object.keys(suitByMonth),
+          ...Object.keys(jacketByMonth),
+          ...Object.keys(shoesByMonth),
+          ...Object.keys(sweaterByMonth),
+        ]);
+
+        const months = Array.from(allMonths).sort();
+
+        const combined: CombinedPoint[] = months.map((m) => ({
+          month: m.slice(0, 7),
+          dress: dressByMonth[m] ?? 0,
+          suit: suitByMonth[m] ?? 0,
+          jacket: jacketByMonth[m] ?? 0,
+          shoes: shoesByMonth[m] ?? 0,
+          sweater: sweaterByMonth[m] ?? 0,
+        }));
+
+        setData(combined);
+        setLoading(false);
+      } catch (e) {
+        if (cancelled) return;
+        console.error(e);
+        setError(
+          "Could not load review counts for dress, suit, jacket, shoes, and sweater."
+        );
+        setLoading(false);
+      }
+    };
+
+    loadAll();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const data: MonthlyPoint[] = useMemo(() => {
-    if (!rows) return [];
-
-    const counts: Record<
-      string,
-      { dress: number; professional: number }
-    > = {};
-
-    for (const r of rows) {
-      const pt = r.product_type?.toLowerCase() ?? "";
-      const rawDate = r.date_posted ?? r.reviewTime;
-      if (!rawDate) continue;
-
-      const d = new Date(rawDate);
-      if (Number.isNaN(d.getTime())) continue;
-
-      const year = d.getFullYear();
-      if (year < 2018 || year > 2021) continue;
-
-      const monthKey = `${year}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-
-      if (!counts[monthKey]) {
-        counts[monthKey] = { dress: 0, professional: 0 };
-      }
-
-      if (pt === "dress") {
-        counts[monthKey].dress += 1;
-      } else if (pt === "professional") {
-        counts[monthKey].professional += 1;
-      }
-    }
-
-    // turn into sorted array
-    const monthKeys = Object.keys(counts).sort();
-    return monthKeys.map((m) => ({
-      month: m,
-      dress: counts[m].dress,
-      professional: counts[m].professional,
+  const toggleCategory = (key: CategoryKey) => {
+    setVisible((prev) => ({
+      ...prev,
+      [key]: !prev[key],
     }));
-  }, [rows]);
+  };
 
   if (error) {
     return (
@@ -103,10 +175,12 @@ export const MacroTrends: React.FC = () => {
     );
   }
 
-  if (!rows || data.length === 0) {
+  if (loading || data.length === 0) {
     return (
       <div className="macro-root">
-        <p className="macro-loading">Loading review trends from df_reviews…</p>
+        <p className="macro-loading">
+          Loading dress, suit, jacket, shoes, and sweater review trends…
+        </p>
       </div>
     );
   }
@@ -114,60 +188,97 @@ export const MacroTrends: React.FC = () => {
   return (
     <div className="macro-root">
       <div className="macro-header">
-        <p className="macro-label">Scene 01 · Macro trends</p>
-        <h2 className="macro-title">
-          How does attention to each category move through the downturn?
-        </h2>
-        <p className="macro-copy">
-          Each point is the number of reviews in a month — a rough proxy for how
-          much attention a category is getting. Toggle between dresses and
-          professional wear to see how differently they react around 2020.
-        </p>
-
         <div className="macro-toggle">
-          {(["dress", "professional"] as SeriesKey[]).map((key) => (
-            <button
-              key={key}
-              type="button"
-              className={
-                "macro-toggle-btn" +
-                (series === key ? " macro-toggle-btn--active" : "")
-              }
-              onClick={() => setSeries(key)}
-            >
-              {SERIES_META[key].label}
-            </button>
-          ))}
+          {(Object.keys(CATEGORY_META) as CategoryKey[]).map((key) => {
+            const meta = CATEGORY_META[key];
+            const isOn = visible[key];
+
+            return (
+              <button
+                key={key}
+                type="button"
+                className={
+                  "macro-toggle-btn" + (isOn ? " macro-toggle-btn--active" : "")
+                }
+                onClick={() => toggleCategory(key)}
+              >
+                <span
+                  className="macro-toggle-dot"
+                  style={{ backgroundColor: meta.color }}
+                />
+                {meta.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <div className="macro-chart-shell">
-        <ResponsiveContainer width="100%" height={260}>
-          <LineChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart
+            data={data}
+            margin={{ top: 10, right: 10, left: 50, bottom: 40 }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+
             <XAxis
               dataKey="month"
               tick={{ fontSize: 10 }}
-              tickFormatter={(v) => v}
+              angle={-35}
+              textAnchor="end"
+              label={{
+                value: "Month (2018–2022)",
+                position: "insideBottom",
+                dy: 30,
+                fontSize: 12,
+              }}
             />
-            <YAxis tick={{ fontSize: 10 }} />
+
+            <YAxis
+              tick={{ fontSize: 10 }}
+              label={{
+                value: "Number of Reviews",
+                angle: -90,
+                position: "insideLeft",
+                dx: -35,
+                fontSize: 12,
+              }}
+            />
+
             <Tooltip
-              labelFormatter={(v) => v}
-              formatter={(value: number) => [value, "Review count"]}
+              formatter={(val: number, key: string) => {
+                const meta =
+                  CATEGORY_META[key as CategoryKey] ?? { label: key };
+                return [val, `${meta.label} reviews`];
+              }}
+              labelFormatter={(m) => m}
             />
-            <Line
-              type="monotone"
-              dataKey={series}
-              stroke="#111827"
-              strokeWidth={2}
-              dot={false}
-              activeDot={{ r: 4 }}
-            />
+
+            {(
+              Object.keys(CATEGORY_META) as CategoryKey[]
+            ).map((key) => {
+              if (!visible[key]) return null;
+              const meta = CATEGORY_META[key];
+              return (
+                <Line
+                  key={key}
+                  type="monotone"
+                  dataKey={key}
+                  stroke={meta.color}
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 4 }}
+                  name={meta.label}
+                />
+              );
+            })}
           </LineChart>
         </ResponsiveContainer>
+
         <p className="macro-footnote">
-          Filtered to 2018–2021 to match the analysis window used in the
-          notebook.
+          Daily review counts were aggregated to months in the notebook. All
+          series share the same y-axis, so relative shapes and spikes are
+          directly comparable.
         </p>
       </div>
     </div>
