@@ -1,14 +1,14 @@
 // src/Book.tsx
-import React from "react";
+import React, { useRef, useState } from "react";
 import HTMLFlipBookDefault from "react-pageflip";
 import "./Book.css";
 import { MacroTrends } from "./MacroTrends";
-import { RecessionUniform } from "./RecessionUniform";
 import { InflationVsSentiment } from "./InflationVsSentiment";
+import { StarRatingMix } from "./StarRatingMix";
 
 const HTMLFlipBook = HTMLFlipBookDefault as any;
 
-type SceneId = "macro" | "inflation" | "uniform" | "price";
+type SceneId = "macro" | "ratings" | "inflation" | "uniform" | "price";
 
 type Scene = {
   id: SceneId;
@@ -28,16 +28,24 @@ const SCENES: Scene[] = [
       "We use monthly review counts as a rough proxy for attention, and track how interest in dresses, suits, jackets, shoes, sweaters, and accessories moves from 2018 through the COVID-era shock.",
   },
   {
-    id: "inflation",
+    id: "ratings",
     number: "02",
+    shortLabel: "Review mix",
+    title: "How does the star rating mix shift through a downturn?",
+    description:
+      "Here we follow the full distribution of ratings—from 1-star rants to 5-star raves—and watch how their shares evolve over time.",
+  },
+  {
+    id: "inflation",
+    number: "03",
     shortLabel: "Sentiment vs. inflation",
     title: "Do shoppers get harsher when prices heat up?",
     description:
-      "Here we line up the share of 1-star reviews with year-over-year inflation. When the cost of living spikes, does patience with fashion products run out faster too?",
+      "We line up the share of 1-star reviews with year-over-year inflation. When the cost of living spikes, does patience with fashion products run out faster too?",
   },
   {
     id: "uniform",
-    number: "03",
+    number: "04",
     shortLabel: "Recession uniform",
     title: "What does a ‘downturn outfit’ look like?",
     description:
@@ -45,7 +53,7 @@ const SCENES: Scene[] = [
   },
   {
     id: "price",
-    number: "04",
+    number: "05",
     shortLabel: "Spending power",
     title: "Price tiers through the crash",
     description:
@@ -54,12 +62,41 @@ const SCENES: Scene[] = [
 ];
 
 function Book() {
+  const bookRef = useRef<any>(null);
+  const [page, setPage] = useState(0);
+
   const macroScene = SCENES.find((s) => s.id === "macro") as Scene;
-  const remainingScenes = SCENES.filter((s) => s.id !== "macro");
+  const ratingsScene = SCENES.find((s) => s.id === "ratings") as Scene;
+  const inflationScene = SCENES.find((s) => s.id === "inflation") as Scene;
+  const remainingScenes = SCENES.filter(
+    (s) => s.id !== "macro" && s.id !== "ratings" && s.id !== "inflation"
+  );
+
+  const goPrev = () => {
+    if (bookRef.current && bookRef.current.pageFlip) {
+      bookRef.current.pageFlip().flipPrev();
+    }
+  };
+
+  const goNext = () => {
+    if (bookRef.current && bookRef.current.pageFlip) {
+      bookRef.current.pageFlip().flipNext();
+    }
+  };
 
   return (
     <div className="book-root">
+      {/* Left arrow */}
+      <button
+        type="button"
+        className="book-arrow book-arrow--left"
+        onClick={goPrev}
+      >
+        ‹
+      </button>
+
       <HTMLFlipBook
+        ref={bookRef}
         width={650}
         height={700}
         maxShadowOpacity={0.5}
@@ -69,10 +106,10 @@ function Book() {
         className="book-flipbook"
         showPageCorners={false}
         style={{}}
+        onFlip={(e: any) => setPage(e.data)}
+        useMouseEvents={false}
       >
-        {/* ------------------------------------------------------ */}
-        {/* COVER PAGE */}
-        {/* ------------------------------------------------------ */}
+        {/* 0: COVER PAGE */}
         <div className="page page--cover">
           <div className="cover-page">
             <div className="cover-top-row">
@@ -109,17 +146,15 @@ function Book() {
             </h1>
 
             <p className="cover-tagline">
-              A visual explainer on how downturns reshape the closet,
-              stitched from fashion products and macro-economic indicators.
+              A visual explainer on how downturns reshape the closet, stitched
+              from fashion products and macro-economic indicators.
             </p>
 
             <p className="cover-byline">Carolyn Lee · Colin McKhann</p>
           </div>
         </div>
 
-        {/* ------------------------------------------------------ */}
-        {/* INTRO TEXT PAGE */}
-        {/* ------------------------------------------------------ */}
+        {/* 1: INTRO TEXT PAGE */}
         <div className="page page--intro">
           <div className="text-page">
             <h1 className="text-page-title">INTRODUCTION</h1>
@@ -149,9 +184,7 @@ function Book() {
           </div>
         </div>
 
-        {/* ------------------------------------------------------ */}
-        {/* SCENE 01: MACRO (INTERACTIVE PAGE)                     */}
-        {/* ------------------------------------------------------ */}
+        {/* 2: SCENE 01: MACRO (INTERACTIVE) */}
         {macroScene && (
           <div className="page" key={macroScene.id}>
             <div className="single-page">
@@ -171,9 +204,7 @@ function Book() {
           </div>
         )}
 
-        {/* ------------------------------------------------------ */}
-        {/* SCENE 01: TEXT PAGE (LIKE INTRO)                       */}
-        {/* ------------------------------------------------------ */}
+        {/* 3: SCENE 01 METHODS */}
         <div className="page page--macro-notes">
           <div className="text-page">
             <h1 className="text-page-title">SCENE 01 · METHODS & NOTES</h1>
@@ -185,8 +216,8 @@ function Book() {
               level.
               <br />
               <br />
-              The goal isn&apos;t to estimate absolute sales, but to compare
-              the relative shapes of these curves across categories and
+              The goal isn&apos;t to estimate absolute sales, but to compare the
+              relative shapes of these curves across categories and
               macroeconomic shocks. Spikes may reflect product launches,
               seasonal events, or news cycles, while longer plateaus and dips
               line up with broader changes in spending behavior.
@@ -199,40 +230,109 @@ function Book() {
           </div>
         </div>
 
-        {/* ------------------------------------------------------ */}
-        {/* REMAINING SCENES (02–04)                               */}
-        {/* ------------------------------------------------------ */}
-        {remainingScenes.map((scene) => (
-          <div className="page" key={scene.id}>
+        {/* 4: SCENE 02: STAR RATING MIX */}
+        {ratingsScene && (
+          <div className="page" key={ratingsScene.id}>
             <div className="single-page">
               <header className="single-page-header">
                 <p className="scene-label">
-                  Scene {scene.number}
-                  {scene.shortLabel && ` · ${scene.shortLabel}`}
+                  Scene {ratingsScene.number}
+                  {ratingsScene.shortLabel && ` · ${ratingsScene.shortLabel}`}
                 </p>
-                <h1 className="scene-title">{scene.title}</h1>
-                {scene.description && (
-                  <p className="scene-text">{scene.description}</p>
+                <h1 className="scene-title">{ratingsScene.title}</h1>
+                {ratingsScene.description && (
+                  <p className="scene-text">{ratingsScene.description}</p>
                 )}
               </header>
 
-              {scene.id === "inflation" && (
-                <InflationVsSentiment />
-              )}
-
-              {scene.id === "uniform" && (
-                <RecessionUniform />
-              )}
-
-              {scene.id === "price" && (
-                <div className="macro-chart-shell">
-                  <p>Price tiers chart coming soon.</p>
-                </div>
-              )}
+              {/* Only mount chart when this page is visible */}
+              <StarRatingMix active={page === 4} />
             </div>
           </div>
-        ))}
+        )}
+
+        <div className="page page--macro-notes">
+          <div className="text-page">
+            <h1 className="text-page-title">SCENE 01 · METHODS & NOTES</h1>
+            <p className="text-page-body">
+              For this scene, we treat monthly review counts as a proxy for how
+              much attention each category receives over time. We aggregate
+              daily product reviews for dresses, suits, jackets, shoes, and
+              sweaters from 2018–2022, and then sum them at the category-month
+              level.
+              <br />
+              <br />
+              The goal isn&apos;t to estimate absolute sales, but to compare the
+              relative shapes of these curves across categories and
+              macroeconomic shocks. Spikes may reflect product launches,
+              seasonal events, or news cycles, while longer plateaus and dips
+              line up with broader changes in spending behavior.
+              <br />
+              <br />
+              Use the toggles to isolate single categories or small groups. As
+              you page forward, keep an eye on how these broad patterns echo —
+              or contradict — more detailed views of sentiment and price tiers.
+            </p>
+          </div>
+        </div>
+
+        {/* 5: SCENE 03: INFLATION VS SENTIMENT */}
+        {inflationScene && (
+          <div className="page" key={inflationScene.id}>
+            <div className="single-page">
+              <header className="single-page-header">
+                <p className="scene-label">
+                  Scene {inflationScene.number}
+                  {inflationScene.shortLabel &&
+                    ` · ${inflationScene.shortLabel}`}
+                </p>
+                <h1 className="scene-title">{inflationScene.title}</h1>
+                {inflationScene.description && (
+                  <p className="scene-text">{inflationScene.description}</p>
+                )}
+              </header>
+
+              <InflationVsSentiment />
+            </div>
+          </div>
+        )}
+
+        <div className="page page--macro-notes">
+          <div className="text-page">
+            <h1 className="text-page-title">VISUALIZATION 3 · ANALYSIS</h1>
+            <p className="text-page-body">
+              For this scene, we treat monthly review counts as a proxy for how
+              much attention each category receives over time. We aggregate
+              daily product reviews for dresses, suits, jackets, shoes, and
+              sweaters from 2018–2022, and then sum them at the category-month
+              level.
+              <br />
+              <br />
+              The goal isn&apos;t to estimate absolute sales, but to compare the
+              relative shapes of these curves across categories and
+              macroeconomic shocks. Spikes may reflect product launches,
+              seasonal events, or news cycles, while longer plateaus and dips
+              line up with broader changes in spending behavior.
+              <br />
+              <br />
+              Use the toggles to isolate single categories or small groups. As
+              you page forward, keep an eye on how these broad patterns echo —
+              or contradict — more detailed views of sentiment and price tiers.
+            </p>
+          </div>
+        </div>
+
+      
       </HTMLFlipBook>
+
+      {/* Right arrow */}
+      <button
+        type="button"
+        className="book-arrow book-arrow--right"
+        onClick={goNext}
+      >
+        ›
+      </button>
     </div>
   );
 }
