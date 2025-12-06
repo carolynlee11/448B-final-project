@@ -146,8 +146,7 @@ function Book() {
             </h1>
 
             <p className="cover-tagline">
-              A visual explainer on how downturns reshape the closet, stitched
-              from fashion products and macro-economic indicators.
+              A visual explainer on how COVID's economic impact changed the wardrobe and the shelf.
             </p>
 
             <p className="cover-byline">Carolyn Lee · Colin McKhann</p>
@@ -160,26 +159,18 @@ function Book() {
             <h1 className="text-page-title">INTRODUCTION</h1>
 
             <p className="text-page-body">
-              In this visualization project, we investigate fashion trends and
-              whether they are reliable indicators of broader economic
-              conditions, particularly recessions. In the past, economic
+              In this visualization project, we investigate fashion trends and how they interlink with times of economic struggle. In the past, economic
               theorists have hypothesized on phenomena like the Hemline Index,
               which established a direct correlation between lengths of skirts
-              and market conditions. For example, in 2010, Marjolein van
-              Baardwijk and Philip Hans Franse published “The hemline and the
-              economy: is there any match?” which investigated data from 1921 to
-              2009. They found that shorter skirts were more present during
-              positive economic conditions. Despite data supporting this theory,
-              it is a simplification of a complex relationship between fashion
-              culture and economic activity.
+              and market conditions. However, we are interested in exploring how economic downturn during the COVID-19 pandemic affected the online shopping space. 
+              Specifically, in times of economic struggle, how are both consumers and sellers affected?
               <br />
               <br />
-              Additionally, with the present fast-fashion industry cycling
+              With the present fast-fashion industry cycling
               trends at unprecedented speeds, it becomes even more difficult to
-              determine whether such trends could even be classified as an
-              indicator of economic conditions. Our project builds upon earlier
-              theories to understand whether they reflect or diverge from
-              traditional economic indicators.
+              determine how trends are interlinked with economic conditions. As such, we also seek to gain a better understanding of 
+              how such an analysis is limited in the modern day and age. For this project, we focus primarily on the Fashion section of the Amazon Reviews dataset
+              from McAuley Lab, interwoven with economic trends provided by the Federal Reserve.
             </p>
           </div>
         </div>
