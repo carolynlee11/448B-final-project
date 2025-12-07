@@ -171,6 +171,8 @@ function Book() {
               exploring how economic downturn during the COVID-19 pandemic
               affected the online shopping space. Specifically, in times of
               economic struggle, how are both consumers and sellers affected?
+              And as a result, do fashion-related indices, like the Hemline Index,
+              have merit in theory?
               <br />
               <br />
               With the present fast-fashion industry cycling trends at
@@ -212,26 +214,20 @@ function Book() {
         {/* ------------------------------------------------------ */}
         <div className="page page--macro-notes">
           <div className="text-page">
-            <h1 className="text-page-title">SCENE 01 · METHODS & NOTES</h1>
+            <h1 className="text-page-title">How Were Different Categories Affected?</h1>
             <p className="text-page-body">
-              For this scene, we treat monthly review counts as a proxy for how
-              much attention each category receives over time. We aggregate
-              daily product reviews for dresses, suits, jackets, shoes, and
-              sweaters from 2018–2022, and then sum them at the category-month
-              level.
+              To begin to analyze the relationship between online shopping and the pandemic, we are interested in first looking at how different types of professional wear changed in popularity.
+              To accomplish this, we treat monthly review counts as a proxy for how
+              much attention each product gets over the 2018-2022 period
               <br />
               <br />
-              The goal isn&apos;t to estimate absolute sales, but to compare the
-              relative shapes of these curves across categories and
-              macroeconomic shocks. Spikes may reflect product launches,
-              seasonal events, or news cycles, while longer plateaus and dips
-              line up with broader changes in spending behavior.
+              In this chart, we see that some items like sweaters and jackets maintain their behavior before and after March of 2020, peaking in the winter and decreasing in the summer. 
+              However, one major standout for these categories is dresses, which steeply decline 
+              from having almost 20 times the reviews in most of 2019 to only twice as many post pandemic. From this, we can see that COVID disproportionally affected dresses versus other types of clothing like suits or sweaters, indicating a strong affect on workwear as a whole.
+              Finally, it is worth noting that most categories did generally see a decrease over this time period, reflecting a more restricted shopper following the start of the pandemic. 
               <br />
               <br />
-              Use the toggles to isolate single categories or small groups. As
-              you page forward, keep an eye on how these broad patterns echo — or
-              contradict — more detailed views of sentiment, inflation, and
-              office-coded outfits.
+              Use the toggles to isolate single categories or small groups to see these specific categories more clearly!
             </p>
           </div>
         </div>
@@ -264,20 +260,19 @@ function Book() {
         {/* ------------------------------------------------------ */}
         <div className="page page--macro-notes">
           <div className="text-page">
-            <h1 className="text-page-title">SCENE 02 · METHODS & NOTES</h1>
+            <h1 className="text-page-title">How Do These Changes Affect Consumer Opinion?</h1>
             <p className="text-page-body">
               Here we take all fashion reviews from 2018–2022 and convert them
-              into monthly proportions of 1–5 star ratings. Instead of focusing
-              on raw counts, we normalize each month so that the stacked areas
-              sum to 100%, which makes it easier to compare the relative weight
-              of harsh vs. glowing reviews over time.
-              <br />
-              <br />
-              The toggles above the chart allow you to isolate specific bands,
+              into monthly proportions of 1–5 star ratings. The toggles above the chart allow you to isolate specific bands,
               such as just 1–2★ complaints or just 4–5★ raves. The brush lets
-              you zoom into shorter windows around key events. As you adjust the
-              view, watch how the mix compresses or stretches: do mid-tier
-              ratings hollow out, or do extremes become more common?
+              you zoom into shorter windows around key events. 
+              <br />
+              <br />
+              With all rating included, the bands all appear to move as one, an effect that disappears when 1 and 5 star ratings
+              are removed. This effect is indicative of how consumer ratings are polarized as a whole - often times flipping between 1
+              and 5 star ratings over time rather than flowing more towards the middle. Broadly speaking, ratings seem to remain rather consistent
+              over this time period, however, there are some spikes of negativity both in March of 2020 and later throughout 2021, which we deemed 
+              worth investigating further.
             </p>
           </div>
         </div>
@@ -310,20 +305,18 @@ function Book() {
         {/* ------------------------------------------------------ */}
         <div className="page page--macro-notes">
           <div className="text-page">
-            <h1 className="text-page-title">SCENE 03 · ANALYSIS</h1>
+            <h1 className="text-page-title">How Does Inflation Affect Consumer Negativity?</h1>
             <p className="text-page-body">
               In this view, we align two series: the share of 1-star reviews in
-              fashion and year-over-year inflation. The goal is not to prove a
-              strict causal relationship, but to explore whether spikes in the
-              cost of living co-occur with a harsher reviewing climate.
+              fashion and year-over-year inflation. Because of the relationship between reviews explored in the previous visual, 
+              we chose to isolate purely the 1 star reviews as a snapshot of sentiment as a whole. 
               <br />
               <br />
               At a high level, we see that periods of elevated inflation often
-              coincide with subtle rises in 1-star share, especially around the
-              sharpest COVID-era dislocations. However, the relationship is
-              noisy: promotional cycles, supply-chain issues, and changing
-              product mixes all add variance. The chart invites you to visually
-              compare local peaks rather than rely on a single summary statistic.
+              coincide with subtle rises in 1-star share. This is most evident from January 2021 to early 2022, where a large spike in inflation
+              is largely paralleled by a stark increased in the proportion of negative reviews. This relationship is not perfect, as for instance,
+              in March 2020 negativity spikes despite very low inflation (which could be a byproduct of the start of lockdown). However, although not enough
+              to declare a causal relationship, there does seem to be an interwoven pattern between inflation and how consumers feel about fashion products.
             </p>
           </div>
         </div>
@@ -355,22 +348,20 @@ function Book() {
         {/* ------------------------------------------------------ */}
         <div className="page page--macro-notes">
           <div className="text-page">
-            <h1 className="text-page-title">SCENE 04 · ANALYSIS</h1>
+            <h1 className="text-page-title">How Do Consumer Changes Affect Sellers?</h1>
             <p className="text-page-body">
               To get a closer look at the &quot;recession uniform,&quot; we
               focus on reviews attached to office-coded pieces: blazers, tailored
               pants, button-downs, and other items that read as workplace wear.
-              We track their share of reviews over time rather than their raw
-              volume, which highlights how prominent office outfits are relative
-              to the rest of the closet.
+              We track the share of the reviews over time, a proxy for the relative attention
+              these products receive in the fast fashion space.
               <br />
               <br />
-              Unsurprisingly, the pandemic years show a sharp break from the
-              pre-2020 trend, with office wear receding as loungewear and casual
-              basics take over. As return-to-office policies roll out, the share
-              of office-coded reviews begins to recover, but not fully to
-              pre-pandemic levels within our window. This suggests a more
-              hybrid, flexible dress code emerging from the shock.
+              From this graph, we first note a somewhat cyclical pattern with office wear reviews,
+              increasing in the first half of the year and decreasing in the second half. Through this lens, we can see across each season
+              a relative increase in the amount of workwear being listed. Moreover, compared to the two pre-pandemic years, in which the cycles remained
+              more or less in the same range, business attire gains an over 5% share in fashion listings over this period compared to the maximum
+              pre-pandemic value.
             </p>
           </div>
         </div>
@@ -383,20 +374,17 @@ function Book() {
             <h1 className="text-page-title">CONCLUSION · SYNTHESIS</h1>
             <p className="text-page-body">
               Taken together, these views suggest that fashion reviews do echo
-              broader economic turbulence, but in textured and sometimes
-              surprising ways. Category-level attention shows how shoppers
-              rebalance the closet as routines change. The star rating mix and
-              1-star share hint at shifts in tolerance for quality, fit, and
-              shipping friction when budgets feel tighter. Office-coded outfits
-              reveal how work, home, and social life reconfigure the demand for
-              more formal silhouettes.
+              broader economic turbulence. Specifically, we note that times of economic
+              turbulence seem to align with both negative consumer sentiment over products
+              and abnormal willingness to change which categories the public chooses to 
+              buy as a whole. In turn, this has a demonstrated impact on what products are listed
+              as well, with office wear being released at a significantly higher rate in times
+              of economic struggle
               <br />
               <br />
-              Rather than a single &quot;index&quot; such as skirt length, our
-              results point toward a bundle of weak signals that, when layered
-              together, help narrate how people materially live through a
-              downturn. Fashion reviews become a noisy, but human-scale,
-              complement to macro indicators like inflation and unemployment.
+              In essence, rather than isolating a specific index, we are lead to believe that the
+              interplay between the online fashion industry and the broader economy is one that is causal
+              rather than coincidental. From this, we believe that further analysis into this relationship is valuable, such as suggested "indices", are worth exploring.
             </p>
           </div>
         </div>
@@ -410,24 +398,20 @@ function Book() {
               CONCLUSION · LIMITATIONS & FUTURE WORK
             </h1>
             <p className="text-page-body">
-              This project is constrained by several factors. Amazon reviews are
-              an imperfect proxy for true demand: they reflect who chooses to
-              write, what gets surfaced in search, and which products survive on
-              the platform. Our heuristics for &quot;office wear&quot; and
-              other categories inevitably miss edge cases and cultural
-              differences in how people dress for work. We also focus on a
-              relatively short window around COVID, so we cannot fully separate
-              pandemic-specific shifts from longer fashion cycles.
+              This project is constrained by the data that is publically available.
+              Specifically, while ratings do have use in both tracking sentiment over time
+              and following where consumer attention is going, it is not a perfect proxy
+              for what products are actually being bought and sold. Further analysis would benefit
+              from partnership with online retailers like Amazon who hold backend sales data to confirm
+              or challenge the conclusions drawn. Additionally, there is some margin of error for exact
+              review counts due to quirks in how Amazon maintains their review API, which does mean that
+              while proportional values still hold, exact counts could be slightly off (although the relative values should still be the same)
               <br />
               <br />
-              A more complete analysis would combine richer product metadata,
-              cross-retailer data, and more formal statistical modeling of the
-              relationships hinted at here. It would also benefit from qualitative
-              work: talking to shoppers and sellers about how they navigated
-              price shocks and changing routines. Still, our interactive views
-              aim to make the link between macro indicators and everyday
-              wardrobe decisions feel tangible — and to show how visualization
-              can stitch those layers together.
+              Future work would include further exploration of these trends in other spaces, including both other online retailers
+              (especially specialty professional brands) and data from brick and mortar stores. Again, this data is to our knowledge not very publically available,
+              so partnership with such brands would be required. Finally, with this exploration in mind, we would be interested in investigating our own version of a 
+              fashion-based index through analyzing if these patterns are maintained in the modern day, as the dataset used was limited to the end of 2022. 
             </p>
           </div>
         </div>
