@@ -1,5 +1,5 @@
 // src/Book.tsx
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import HTMLFlipBookDefault from "react-pageflip";
 import "./Book.css";
 import { MacroTrends } from "./MacroTrends";
@@ -83,6 +83,17 @@ function Book() {
     }
   };
 
+  const handleFlip = (e: any) => {
+    setPage(e.data);
+
+    // Nudge Recharts to recompute ResponsiveContainer sizes
+    if (typeof window !== "undefined") {
+      window.setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+      }, 0);
+    }
+  };
+
   return (
     <div className="book-root">
       {/* Left arrow */}
@@ -105,12 +116,10 @@ function Book() {
         className="book-flipbook"
         showPageCorners={false}
         style={{}}
-        onFlip={(e: any) => setPage(e.data)}
+        onFlip={handleFlip}
         useMouseEvents={false}
       >
-        {/* ------------------------------------------------------ */}
-        {/* 0: COVER PAGE                                          */}
-        {/* ------------------------------------------------------ */}
+        {/* 0: COVER PAGE */}
         <div className="page page--cover">
           <div className="cover-page">
             <div className="cover-top-row">
@@ -155,13 +164,10 @@ function Book() {
           </div>
         </div>
 
-        {/* ------------------------------------------------------ */}
-        {/* 1: INTRO TEXT PAGE                                     */}
-        {/* ------------------------------------------------------ */}
+        {/* 1: INTRO TEXT PAGE */}
         <div className="page page--intro">
           <div className="text-page">
             <h1 className="text-page-title">INTRODUCTION</h1>
-
             <p className="text-page-body">
               In this visualization project, we investigate fashion trends and
               how they interlink with times of economic struggle. In the past,
@@ -171,8 +177,8 @@ function Book() {
               exploring how economic downturn during the COVID-19 pandemic
               affected the online shopping space. Specifically, in times of
               economic struggle, how are both consumers and sellers affected?
-              And as a result, do fashion-related indices, like the Hemline Index,
-              have merit in theory?
+              And as a result, do fashion-related indices, like the Hemline
+              Index, have merit in theory?
               <br />
               <br />
               With the present fast-fashion industry cycling trends at
@@ -187,9 +193,7 @@ function Book() {
           </div>
         </div>
 
-        {/* ------------------------------------------------------ */}
-        {/* 2: SCENE 01: MACRO (INTERACTIVE)                       */}
-        {/* ------------------------------------------------------ */}
+        {/* 2: SCENE 01: MACRO (INTERACTIVE) */}
         {macroScene && (
           <div className="page" key={macroScene.id}>
             <div className="single-page">
@@ -209,32 +213,40 @@ function Book() {
           </div>
         )}
 
-        {/* ------------------------------------------------------ */}
-        {/* 3: SCENE 01 · METHODS & NOTES                          */}
-        {/* ------------------------------------------------------ */}
+        {/* 3: SCENE 01 · METHODS & NOTES */}
         <div className="page page--macro-notes">
           <div className="text-page">
-            <h1 className="text-page-title">How Were Different Categories Affected?</h1>
+            <h1 className="text-page-title">
+              How Were Different Categories Affected?
+            </h1>
             <p className="text-page-body">
-              To begin to analyze the relationship between online shopping and the pandemic, we are interested in first looking at how different types of professional wear changed in popularity.
-              To accomplish this, we treat monthly review counts as a proxy for how
-              much attention each product gets over the 2018-2022 period
+              To begin to analyze the relationship between online shopping and
+              the pandemic, we are interested in first looking at how different
+              types of professional wear changed in popularity. To accomplish
+              this, we treat monthly review counts as a proxy for how much
+              attention each product gets over the 2018–2022 period.
               <br />
               <br />
-              In this chart, we see that some items like sweaters and jackets maintain their behavior before and after March of 2020, peaking in the winter and decreasing in the summer. 
-              However, one major standout for these categories is dresses, which steeply decline 
-              from having almost 20 times the reviews in most of 2019 to only twice as many post pandemic. From this, we can see that COVID disproportionally affected dresses versus other types of clothing like suits or sweaters, indicating a strong affect on workwear as a whole.
-              Finally, it is worth noting that most categories did generally see a decrease over this time period, reflecting a more restricted shopper following the start of the pandemic. 
+              In this chart, we see that some items like sweaters and jackets
+              maintain their behavior before and after March of 2020, peaking in
+              the winter and decreasing in the summer. However, one major
+              standout for these categories is dresses, which steeply decline
+              from having almost 20 times the reviews in most of 2019 to only
+              twice as many post pandemic. From this, we can see that COVID
+              disproportionally affected dresses versus other types of clothing
+              like suits or sweaters, indicating a strong effect on workwear as
+              a whole. Finally, it is worth noting that most categories did
+              generally see a decrease over this time period, reflecting a more
+              restricted shopper following the start of the pandemic.
               <br />
               <br />
-              Use the toggles to isolate single categories or small groups to see these specific categories more clearly!
+              Use the toggles to isolate single categories or small groups to
+              see these specific categories more clearly!
             </p>
           </div>
         </div>
 
-        {/* ------------------------------------------------------ */}
-        {/* 4: SCENE 02: STAR RATING MIX                           */}
-        {/* ------------------------------------------------------ */}
+        {/* 4: SCENE 02: STAR RATING MIX */}
         {ratingsScene && (
           <div className="page" key={ratingsScene.id}>
             <div className="single-page">
@@ -249,37 +261,39 @@ function Book() {
                 )}
               </header>
 
-              {/* Only mount chart when this page is visible */}
               <StarRatingMix active={page === 4} />
             </div>
           </div>
         )}
 
-        {/* ------------------------------------------------------ */}
-        {/* 5: SCENE 02 · METHODS & NOTES                          */}
-        {/* ------------------------------------------------------ */}
+        {/* 5: SCENE 02 · METHODS & NOTES */}
         <div className="page page--macro-notes">
           <div className="text-page">
-            <h1 className="text-page-title">How Do These Changes Affect Consumer Opinion?</h1>
+            <h1 className="text-page-title">
+              How Do These Changes Affect Consumer Opinion?
+            </h1>
             <p className="text-page-body">
               Here we take all fashion reviews from 2018–2022 and convert them
-              into monthly proportions of 1–5 star ratings. The toggles above the chart allow you to isolate specific bands,
-              such as just 1–2★ complaints or just 4–5★ raves. The brush lets
-              you zoom into shorter windows around key events. 
+              into monthly proportions of 1–5 star ratings. The toggles above
+              the chart allow you to isolate specific bands, such as just 1–2★
+              complaints or just 4–5★ raves. The brush lets you zoom into
+              shorter windows around key events.
               <br />
               <br />
-              With all rating included, the bands all appear to move as one, an effect that disappears when 1 and 5 star ratings
-              are removed. This effect is indicative of how consumer ratings are polarized as a whole - often times flipping between 1
-              and 5 star ratings over time rather than flowing more towards the middle. Broadly speaking, ratings seem to remain rather consistent
-              over this time period, however, there are some spikes of negativity both in March of 2020 and later throughout 2021, which we deemed 
-              worth investigating further.
+              With all ratings included, the bands all appear to move as one, an
+              effect that disappears when 1 and 5 star ratings are removed. This
+              effect is indicative of how consumer ratings are polarized as a
+              whole—often flipping between 1 and 5 star ratings over time rather
+              than flowing more towards the middle. Broadly speaking, ratings
+              seem to remain rather consistent over this time period; however,
+              there are some spikes of negativity both in March of 2020 and
+              later throughout 2021, which we deemed worth investigating
+              further.
             </p>
           </div>
         </div>
 
-        {/* ------------------------------------------------------ */}
-        {/* 6: SCENE 03: INFLATION VS SENTIMENT                    */}
-        {/* ------------------------------------------------------ */}
+        {/* 6: SCENE 03: INFLATION VS SENTIMENT */}
         {inflationScene && (
           <div className="page" key={inflationScene.id}>
             <div className="single-page">
@@ -300,30 +314,35 @@ function Book() {
           </div>
         )}
 
-        {/* ------------------------------------------------------ */}
-        {/* 7: SCENE 03 · ANALYSIS                                 */}
-        {/* ------------------------------------------------------ */}
+        {/* 7: SCENE 03 · ANALYSIS */}
         <div className="page page--macro-notes">
           <div className="text-page">
-            <h1 className="text-page-title">How Does Inflation Affect Consumer Negativity?</h1>
+            <h1 className="text-page-title">
+              How Does Inflation Affect Consumer Negativity?
+            </h1>
             <p className="text-page-body">
               In this view, we align two series: the share of 1-star reviews in
-              fashion and year-over-year inflation. Because of the relationship between reviews explored in the previous visual, 
-              we chose to isolate purely the 1 star reviews as a snapshot of sentiment as a whole. 
+              fashion and year-over-year inflation. Because of the relationship
+              between reviews explored in the previous visual, we chose to
+              isolate purely the 1 star reviews as a snapshot of sentiment as a
+              whole.
               <br />
               <br />
               At a high level, we see that periods of elevated inflation often
-              coincide with subtle rises in 1-star share. This is most evident from January 2021 to early 2022, where a large spike in inflation
-              is largely paralleled by a stark increased in the proportion of negative reviews. This relationship is not perfect, as for instance,
-              in March 2020 negativity spikes despite very low inflation (which could be a byproduct of the start of lockdown). However, although not enough
-              to declare a causal relationship, there does seem to be an interwoven pattern between inflation and how consumers feel about fashion products.
+              coincide with subtle rises in 1-star share. This is most evident
+              from January 2021 to early 2022, where a large spike in inflation
+              is largely paralleled by a stark increase in the proportion of
+              negative reviews. This relationship is not perfect, as, for
+              instance, in March 2020 negativity spikes despite very low
+              inflation (which could be a byproduct of the start of lockdown).
+              However, although not enough to declare a causal relationship,
+              there does seem to be an interwoven pattern between inflation and
+              how consumers feel about fashion products.
             </p>
           </div>
         </div>
 
-        {/* ------------------------------------------------------ */}
-        {/* 8: SCENE 04: RECESSION UNIFORM (OFFICE WEAR SHARE)     */}
-        {/* ------------------------------------------------------ */}
+        {/* 8: SCENE 04: RECESSION UNIFORM (OFFICE WEAR SHARE) */}
         {uniformScene && (
           <div className="page" key={uniformScene.id}>
             <div className="single-page">
@@ -338,80 +357,92 @@ function Book() {
                 )}
               </header>
 
-              <OfficeWearProportion />
+              <OfficeWearProportion active={page === 8} />
             </div>
           </div>
         )}
 
-        {/* ------------------------------------------------------ */}
-        {/* 9: SCENE 04 · ANALYSIS                                 */}
-        {/* ------------------------------------------------------ */}
+        {/* 9: SCENE 04 · ANALYSIS */}
         <div className="page page--macro-notes">
           <div className="text-page">
-            <h1 className="text-page-title">How Do Consumer Changes Affect Sellers?</h1>
+            <h1 className="text-page-title">
+              How Do Consumer Changes Affect Sellers?
+            </h1>
             <p className="text-page-body">
               To get a closer look at the &quot;recession uniform,&quot; we
-              focus on reviews attached to office-coded pieces: blazers, tailored
-              pants, button-downs, and other items that read as workplace wear.
-              We track the share of the reviews over time, a proxy for the relative attention
-              these products receive in the fast fashion space.
+              focus on reviews attached to office-coded pieces: blazers,
+              tailored pants, button-downs, and other items that read as
+              workplace wear. We track the share of the reviews over time, a
+              proxy for the relative attention these products receive in the
+              fast fashion space.
               <br />
               <br />
-              From this graph, we first note a somewhat cyclical pattern with office wear reviews,
-              increasing in the first half of the year and decreasing in the second half. Through this lens, we can see across each season
-              a relative increase in the amount of workwear being listed. Moreover, compared to the two pre-pandemic years, in which the cycles remained
-              more or less in the same range, business attire gains an over 5% share in fashion listings over this period compared to the maximum
-              pre-pandemic value.
+              From this graph, we first note a somewhat cyclical pattern with
+              office-wear reviews, increasing in the first half of the year and
+              decreasing in the second half. Through this lens, we can see
+              across each season a relative increase in the amount of workwear
+              being listed. Moreover, compared to the two pre-pandemic years, in
+              which the cycles remained more or less in the same range,
+              business attire gains an over 5% share in fashion listings over
+              this period compared to the maximum pre-pandemic value.
             </p>
           </div>
         </div>
 
-        {/* ------------------------------------------------------ */}
-        {/* 10: CONCLUSION (SYNTHESIS)                             */}
-        {/* ------------------------------------------------------ */}
+        {/* 10: CONCLUSION (SYNTHESIS) */}
         <div className="page page--intro">
           <div className="text-page">
             <h1 className="text-page-title">CONCLUSION · SYNTHESIS</h1>
             <p className="text-page-body">
               Taken together, these views suggest that fashion reviews do echo
-              broader economic turbulence. Specifically, we note that times of economic
-              turbulence seem to align with both negative consumer sentiment over products
-              and abnormal willingness to change which categories the public chooses to 
-              buy as a whole. In turn, this has a demonstrated impact on what products are listed
-              as well, with office wear being released at a significantly higher rate in times
-              of economic struggle
+              broader economic turbulence. Specifically, we note that times of
+              economic turbulence seem to align with both negative consumer
+              sentiment over products and abnormal willingness to change which
+              categories the public chooses to buy as a whole. In turn, this has
+              a demonstrated impact on what products are listed as well, with
+              office wear being released at a significantly higher rate in times
+              of economic struggle.
               <br />
               <br />
-              In essence, rather than isolating a specific index, we are lead to believe that the
-              interplay between the online fashion industry and the broader economy is one that is causal
-              rather than coincidental. From this, we believe that further analysis into this relationship is valuable, such as suggested "indices", are worth exploring.
+              In essence, rather than isolating a specific index, we are led to
+              believe that the interplay between the online fashion industry and
+              the broader economy is one that is causal rather than
+              coincidental. From this, we believe that further analysis into
+              this relationship is valuable, and that suggested &quot;indices&quot;
+              are worth exploring.
             </p>
           </div>
         </div>
 
-        {/* ------------------------------------------------------ */}
-        {/* 11: CONCLUSION (LIMITATIONS & FUTURE WORK)             */}
-        {/* ------------------------------------------------------ */}
+        {/* 11: CONCLUSION (LIMITATIONS & FUTURE WORK) */}
         <div className="page page--intro">
           <div className="text-page">
             <h1 className="text-page-title">
               CONCLUSION · LIMITATIONS & FUTURE WORK
             </h1>
             <p className="text-page-body">
-              This project is constrained by the data that is publically available.
-              Specifically, while ratings do have use in both tracking sentiment over time
-              and following where consumer attention is going, it is not a perfect proxy
-              for what products are actually being bought and sold. Further analysis would benefit
-              from partnership with online retailers like Amazon who hold backend sales data to confirm
-              or challenge the conclusions drawn. Additionally, there is some margin of error for exact
-              review counts due to quirks in how Amazon maintains their review API, which does mean that
-              while proportional values still hold, exact counts could be slightly off (although the relative values should still be the same)
+              This project is constrained by the data that is publicly
+              available. Specifically, while ratings do have use in both
+              tracking sentiment over time and following where consumer
+              attention is going, they are not a perfect proxy for what products
+              are actually being bought and sold. Further analysis would benefit
+              from partnership with online retailers like Amazon who hold
+              backend sales data to confirm or challenge the conclusions drawn.
+              Additionally, there is some margin of error for exact review
+              counts due to quirks in how Amazon maintains their review API,
+              which does mean that while proportional values still hold, exact
+              counts could be slightly off.
               <br />
               <br />
-              Future work would include further exploration of these trends in other spaces, including both other online retailers
-              (especially specialty professional brands) and data from brick and mortar stores. Again, this data is to our knowledge not very publically available,
-              so partnership with such brands would be required. Finally, with this exploration in mind, we would be interested in investigating our own version of a 
-              fashion-based index through analyzing if these patterns are maintained in the modern day, as the dataset used was limited to the end of 2022. 
+              Future work would include further exploration of these trends in
+              other spaces, including both other online retailers (especially
+              specialty professional brands) and data from brick-and-mortar
+              stores. Again, this data is, to our knowledge, not very publicly
+              available, so partnership with such brands would be required.
+              Finally, with this exploration in mind, we would be interested in
+              investigating our own version of a fashion-based index through
+              analyzing if these patterns are maintained in the modern day, as
+              the dataset used was limited to the end of 2022.
             </p>
           </div>
         </div>
@@ -430,3 +461,4 @@ function Book() {
 }
 
 export default Book;
+

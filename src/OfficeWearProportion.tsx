@@ -1,5 +1,4 @@
 // src/OfficeWearProportion.tsx
-import React, { useEffect, useState, useMemo } from "react";
 import Papa from "papaparse";
 import {
   LineChart,
@@ -11,6 +10,7 @@ import {
   ResponsiveContainer,
   Brush,
 } from "recharts";
+import { useEffect, useState, useMemo } from "react";
 
 type OfficePoint = {
   month: string;
@@ -18,7 +18,7 @@ type OfficePoint = {
 };
 
 type Props = {
-  active?: boolean; // <- important
+  active?: boolean;
 };
 
 export const OfficeWearProportion: React.FC<Props> = ({ active = true }) => {
@@ -28,9 +28,6 @@ export const OfficeWearProportion: React.FC<Props> = ({ active = true }) => {
   const [brushStart, setBrushStart] = useState(0);
   const [brushEnd, setBrushEnd] = useState(0);
 
-  // --------------------------
-  // Load CSV (always runs)
-  // --------------------------
   useEffect(() => {
     Papa.parse("/data/office_wear_proportion.csv", {
       download: true,
@@ -55,9 +52,6 @@ export const OfficeWearProportion: React.FC<Props> = ({ active = true }) => {
     });
   }, []);
 
-  // --------------------------
-  // Precompute values (always run)
-  // --------------------------
   const yDomain = useMemo(() => {
     if (data.length === 0) return [0, 1];
     const vals = data.map((d) => d.office_share);
@@ -68,22 +62,13 @@ export const OfficeWearProportion: React.FC<Props> = ({ active = true }) => {
 
   const yTicks = useMemo(() => {
     const [min, max] = yDomain;
-    const count = 5;
-    const step = (max - min) / (count - 1);
-    return Array.from({ length: count }, (_, i) => min + i * step);
+    const n = 5;
+    const step = (max - min) / (n - 1);
+    return Array.from({ length: n }, (_, i) => min + i * step);
   }, [yDomain]);
 
-  // --------------------------
-  // Render placeholder if not active
-  // (prevents conditional hook execution)
-  // --------------------------
-  if (!active) {
-    return <div style={{ height: 330 }} />;
-  }
+  if (!active) return <div style={{ height: 330 }} />;
 
-  // --------------------------
-  // Render chart
-  // --------------------------
   if (loading || data.length === 0) {
     return (
       <div className="macro-chart-shell">
@@ -92,17 +77,6 @@ export const OfficeWearProportion: React.FC<Props> = ({ active = true }) => {
     );
   }
 
-  const startIndex = brushStart;
-  const endIndex = brushEnd;
-
-  const windowSlice = data.slice(startIndex, endIndex + 1);
-  const avg =
-    windowSlice.reduce((s, p) => s + p.office_share, 0) /
-    windowSlice.length;
-
-  const startMonth = data[startIndex]?.month;
-  const endMonth = data[endIndex]?.month;
-
   return (
     <div className="macro-chart-shell">
       <h3 className="infl-chart-title">
@@ -110,13 +84,16 @@ export const OfficeWearProportion: React.FC<Props> = ({ active = true }) => {
       </h3>
 
       <ResponsiveContainer width="100%" height={340}>
-        <LineChart data={data} margin={{ top: 20, right: 24, left: 0, bottom: 40 }}>
+        <LineChart
+          data={data}
+          margin={{ top: 20, right: 24, left: 0, bottom: 40 }}
+        >
           <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
 
           <XAxis
             dataKey="month"
             tick={{ fontSize: 10 }}
-            label={{ value: "Month", position: "insideBottom", dy: 20, fontSize: 12 }}
+            label={{ value: "Month", position: "insideBottom", dy: 20 }}
           />
 
           <YAxis
@@ -150,15 +127,15 @@ export const OfficeWearProportion: React.FC<Props> = ({ active = true }) => {
           <Brush
             dataKey="month"
             height={24}
-            y={300}
             stroke="#9ca3af"
             fill="#f9fafb"
             travellerWidth={8}
+            y={300}
             startIndex={brushStart}
             endIndex={brushEnd}
-            onChange={(r) => {
-              if (r.startIndex != null) setBrushStart(r.startIndex);
-              if (r.endIndex != null) setBrushEnd(r.endIndex);
+            onChange={(range) => {
+              if (range.startIndex != null) setBrushStart(range.startIndex);
+              if (range.endIndex != null) setBrushEnd(range.endIndex);
             }}
           />
         </LineChart>

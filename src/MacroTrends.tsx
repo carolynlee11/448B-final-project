@@ -143,6 +143,13 @@ export const MacroTrends: React.FC = () => {
 
         setData(combined);
         setLoading(false);
+
+      if (typeof window !== "undefined") {
+        window.setTimeout(() => {
+          window.dispatchEvent(new Event("resize"));
+        }, 0);
+      }
+
       } catch (e) {
         if (cancelled) return;
         console.error(e);

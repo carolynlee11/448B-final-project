@@ -1,5 +1,4 @@
 // src/StarRatingMix.tsx
-import React, { useEffect, useState } from "react";
 import Papa from "papaparse";
 import {
   AreaChart,
@@ -12,9 +11,10 @@ import {
   Legend,
   Brush,
 } from "recharts";
+import { useEffect, useState } from "react";
 
 type RatingPoint = {
-  month: string; // "YYYY-MM"
+  month: string;
   r1: number;
   r2: number;
   r3: number;
@@ -34,24 +34,21 @@ const RATING_LABEL: Record<RatingKey, string> = {
 };
 
 const RATING_COLORS: Record<RatingKey, string> = {
-  r1: "#4c1d95", // deep purple
-  r2: "#1d4ed8", // blue
-  r3: "#0d9488", // teal
-  r4: "#22c55e", // green
-  r5: "#eab308", // yellow
+  r1: "#4c1d95",
+  r2: "#1d4ed8",
+  r3: "#0d9488",
+  r4: "#22c55e",
+  r5: "#eab308",
 };
 
-type StarRatingMixProps = {
-  active?: boolean; // whether the page is currently visible in the flipbook
+type Props = {
+  active?: boolean;
 };
 
-export const StarRatingMix: React.FC<StarRatingMixProps> = ({
-  active = true,
-}) => {
+export const StarRatingMix: React.FC<Props> = ({ active = true }) => {
   const [data, setData] = useState<RatingPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // which ratings are currently visible
   const [visibleRatings, setVisibleRatings] = useState<RatingKey[]>([
     "r1",
     "r2",
@@ -60,9 +57,6 @@ export const StarRatingMix: React.FC<StarRatingMixProps> = ({
     "r5",
   ]);
 
-  // hover-driven state for the narrative
-  const [activePoint, setActivePoint] = useState<RatingPoint | null>(null);
-
   useEffect(() => {
     Papa.parse("/data/monthly_star_rating_proportions.csv", {
       download: true,
@@ -70,22 +64,16 @@ export const StarRatingMix: React.FC<StarRatingMixProps> = ({
       dynamicTyping: true,
       skipEmptyLines: true,
       complete: (res) => {
-        const rows = res.data as any[];
-
-        const parsed: RatingPoint[] = rows.map((r) => {
-          const month = String(r["year_month"]).slice(0, 7); // "2018-01"
-
-          const r1 = parseFloat(r["1.0"] ?? 0) || 0;
-          const r2 = parseFloat(r["2.0"] ?? 0) || 0;
-          const r3 = parseFloat(r["3.0"] ?? 0) || 0;
-          const r4 = parseFloat(r["4.0"] ?? 0) || 0;
-          const r5 = parseFloat(r["5.0"] ?? 0) || 0;
-
-          return { month, r1, r2, r3, r4, r5 };
-        });
+        const parsed: RatingPoint[] = (res.data as any[]).map((r) => ({
+          month: String(r["year_month"]).slice(0, 7),
+          r1: parseFloat(r["1.0"] ?? 0) || 0,
+          r2: parseFloat(r["2.0"] ?? 0) || 0,
+          r3: parseFloat(r["3.0"] ?? 0) || 0,
+          r4: parseFloat(r["4.0"] ?? 0) || 0,
+          r5: parseFloat(r["5.0"] ?? 0) || 0,
+        }));
 
         setData(parsed);
-        setActivePoint(parsed[parsed.length - 1] ?? null);
         setLoading(false);
       },
     });
@@ -93,18 +81,10 @@ export const StarRatingMix: React.FC<StarRatingMixProps> = ({
 
   const toggleRating = (key: RatingKey) => {
     setVisibleRatings((curr) =>
-      curr.includes(key) ? curr.filter((k) => k !== key) : [...curr, key]
+      curr.includes(key)
+        ? curr.filter((k) => k !== key)
+        : [...curr, key]
     );
-  };
-
-  const handleMouseMove = (state: any) => {
-    if (!state || !state.activePayload || !state.activePayload[0]) return;
-    const point = state.activePayload[0].payload as RatingPoint;
-    setActivePoint(point);
-  };
-
-  const handleMouseLeave = () => {
-    // keep last activePoint so the text doesn’t disappear
   };
 
   if (loading || data.length === 0) {
@@ -115,35 +95,19 @@ export const StarRatingMix: React.FC<StarRatingMixProps> = ({
     );
   }
 
-  // --- dynamic Y domain based on visible ratings (stack max) ---
   const maxStack = (() => {
-    if (!data.length || !visibleRatings.length) return 1;
     let max = 0;
     for (const p of data) {
       let sum = 0;
-      for (const key of visibleRatings) {
-        sum += p[key];
-      }
+      for (const k of visibleRatings) sum += p[k];
       if (sum > max) max = sum;
     }
     return Math.min(1, Math.max(0, max));
   })();
 
-  const summary =
-    activePoint &&
-    (() => {
-      const month = activePoint.month;
-      const pct = (k: RatingKey) => (activePoint[k] * 100).toFixed(1) + "%";
-
-      return `In ${month}, ${pct("r5")} of reviews were 5-star and ${pct(
-        "r1"
-      )} were 1-star, with the remaining share spread across 2–4★ ratings.`;
-    })();
-
   return (
     <div className="macro-chart-shell">
-      
-      {/* Toggle chips above the chart */}
+      {/* Toggles */}
       <div className="macro-toggle-row" style={{ marginBottom: "0.75rem" }}>
         <span className="macro-toggle-label">Highlight ratings:</span>
         {RATING_KEYS.map((key) => (
@@ -162,85 +126,60 @@ export const StarRatingMix: React.FC<StarRatingMixProps> = ({
             {RATING_LABEL[key]}
           </button>
         ))}
-
-        
       </div>
+
       <h3 className="infl-chart-title">
-          Proportion of Reviews by Star Rating Over Time (2018–2022)
-        </h3>
+        Proportion of Reviews by Star Rating Over Time (2018–2022)
+      </h3>
 
       {active ? (
         <ResponsiveContainer width="100%" height={340}>
           <AreaChart
             data={data}
             margin={{ top: 10, right: 20, left: 0, bottom: 60 }}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
           >
             <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
 
             <XAxis
               dataKey="month"
               tick={{ fontSize: 10 }}
-              label={{
-                value: "Month",
-                position: "insideBottom",
-                dy: 12,
-                style: { fontSize: 12 },
-              }}
+              label={{ value: "Month", position: "insideBottom", dy: 12 }}
             />
 
             <YAxis
-              tick={{ fontSize: 10 }}
-              domain={[0, maxStack]} // dynamic scale that adapts to toggles
+              domain={[0, maxStack]}
               tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
+              tick={{ fontSize: 10 }}
               label={{
                 value: "Proportion of reviews",
                 angle: -90,
                 position: "insideLeft",
                 dx: 5,
                 dy: 60,
-                style: { fontSize: 12 },
+                fontSize: 12,
               }}
             />
 
             <Tooltip
-              formatter={(v: number, key: any) => {
-                const labelMap: Record<string, string> = {
-                  r1: "1★",
-                  r2: "2★",
-                  r3: "3★",
-                  r4: "4★",
-                  r5: "5★",
-                };
-                return [`${(v * 100).toFixed(2)}%`, labelMap[key] ?? key];
-              }}
-              labelFormatter={(v) => v}
+              formatter={(v: number, key: any) => [
+                `${(v * 100).toFixed(2)}%`,
+                RATING_LABEL[key as RatingKey] ?? key,
+              ]}
             />
 
             <Legend
               verticalAlign="top"
               align="right"
               wrapperStyle={{ fontSize: 10, paddingBottom: 8 }}
-              formatter={(value: string) => {
-                const map: Record<string, string> = {
-                  r1: "1★",
-                  r2: "2★",
-                  r3: "3★",
-                  r4: "4★",
-                  r5: "5★",
-                };
-                return map[value] ?? value;
-              }}
+              formatter={(value: any) => RATING_LABEL[value as RatingKey]}
             />
 
-            {/* Brush / slider with a clean bar at the bottom */}
             <Brush
               dataKey="month"
               height={20}
               stroke="#9ca3af"
-              travellerWidth={8}
               fill="#f9fafb"
+              travellerWidth={8}
               y={280}
             />
 
@@ -260,11 +199,8 @@ export const StarRatingMix: React.FC<StarRatingMixProps> = ({
           </AreaChart>
         </ResponsiveContainer>
       ) : (
-        // Keep the layout height even when not active
         <div style={{ height: 340 }} />
       )}
-
-
     </div>
   );
 };
